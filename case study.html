@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soft Skills Case Study Mystery Deck</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-back-bg: #ffffff;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #6366f1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.15) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        /* Header & Controls */
+        header {
+            max-width: 1400px;
+            margin: 0 auto 2.5rem auto;
+            text-align: center;
+        }
+
+        .badge-header {
+            display: inline-block;
+            background: rgba(99, 102, 241, 0.2);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.75rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto 2rem auto;
+            line-height: 1.6;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .stats-pill {
+            background: rgba(15, 23, 42, 0.8);
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.75rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .stats-pill span b {
+            color: #38bdf8;
+        }
+
+        .btn {
+            border: none;
+            outline: none;
+            padding: 0.7rem 1.3rem;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: white;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(51, 65, 85, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(71, 85, 105, 1);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.35);
+        }
+
+        /* Grid & Flashcards (FIXED 3D FLIP MECHANICS) */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .card-scene {
+            height: 360px;
+            perspective: 1200px;
+            cursor: pointer;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.65s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+            -webkit-transform-style: preserve-3d;
+            border-radius: 1.25rem;
+        }
+
+        .card-scene:hover .card:not(.is-flipped) {
+            transform: translateY(-6px);
+        }
+
+        .card.is-flipped {
+            transform: rotateY(180deg);
+            -webkit-transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 1.25rem;
+            padding: 1.4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.45);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            transition: opacity 0.25s ease, visibility 0.25s ease;
+        }
+
+        /* Card Front (Mystery Box) */
+        .card-front {
+            color: white;
+            text-align: center;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            transform: rotateY(0deg);
+            -webkit-transform: rotateY(0deg);
+            z-index: 2;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .card.is-flipped .card-front {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .mystery-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+        }
+
+        .card-number {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.75rem;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        .mystery-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            background: rgba(0, 0, 0, 0.28);
+            padding: 0.45rem 1.1rem;
+            border-radius: 999px;
+            color: #ffffff !important;
+        }
+
+        /* Card Back (Revealed Topic - Guaranteed Visible When Flipped) */
+        .card-back {
+            background: #ffffff;
+            color: #0f172a;
+            transform: rotateY(180deg);
+            -webkit-transform: rotateY(180deg);
+            border: 4px solid #6366f1;
+            text-align: left;
+            z-index: 1;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .card.is-flipped .card-back {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            z-index: 3;
+        }
+
+        .card-back-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.55rem;
+        }
+
+        .cat-tag {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.28rem 0.65rem;
+            border-radius: 0.45rem;
+            color: white;
+        }
+
+        .card-num-small {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #64748b;
+        }
+
+        .topic-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.28;
+            margin-bottom: 0.5rem;
+        }
+
+        .topic-hook {
+            font-size: 0.86rem;
+            color: #334155;
+            line-height: 1.45;
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 0.65rem;
+            padding-right: 0.2rem;
+        }
+
+        .skills-box {
+            background: #f1f5f9;
+            padding: 0.6rem 0.75rem;
+            border-radius: 0.65rem;
+            border-left: 4px solid #6366f1;
+            margin-bottom: 0.65rem;
+        }
+
+        .skills-label {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #64748b;
+            display: block;
+            margin-bottom: 0.15rem;
+        }
+
+        .skills-text {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #1e293b;
+            line-height: 1.3;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-card {
+            flex: 1;
+            padding: 0.5rem 0.6rem;
+            font-size: 0.78rem;
+            font-weight: 700;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-claim {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-claim:hover {
+            background: #059669;
+        }
+
+        .btn-claim.claimed {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-expand {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .btn-expand:hover {
+            background: #cbd5e1;
+        }
+
+        /* Claimed overlay state */
+        .card.is-claimed .card-back {
+            background: #f8fafc;
+        }
+
+        .claimed-stamp {
+            display: none;
+            background: #10b981;
+            color: white;
+            font-size: 0.68rem;
+            font-weight: 800;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.35rem;
+            text-transform: uppercase;
+        }
+
+        .card.is-claimed .claimed-stamp {
+            display: inline-block;
+        }
+
+        /* Modal for Spotlight / Lucky Draw */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 1.5rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.25s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-card {
+            background: white;
+            color: #0f172a;
+            width: 100%;
+            max-width: 650px;
+            border-radius: 1.5rem;
+            padding: 2.25rem;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            border-top: 10px solid #6366f1;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.25rem;
+            background: #f1f5f9;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            color: #334155;
+        }
+
+        .modal-num {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #6366f1;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.4rem;
+        }
+
+        .modal-title {
+            font-size: 1.85rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            line-height: 1.25;
+        }
+
+        .modal-hook {
+            font-size: 1.1rem;
+            color: #334155;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            background: #f8fafc;
+            padding: 1.1rem;
+            border-radius: 0.85rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .roles-guide {
+            background: #eef2ff;
+            border-radius: 0.85rem;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .roles-guide h4 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: #4338ca;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        .roles-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            font-size: 0.82rem;
+            color: #1e1b4b;
+        }
+
+        /* Vibrant Gradients Palette */
+        .grad-0 { background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%); }
+        .grad-1 { background: linear-gradient(135deg, #7F00FF 0%, #E100FF 100%); }
+        .grad-2 { background: linear-gradient(135deg, #00B4DB 0%, #0083B0 100%); }
+        .grad-3 { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .grad-4 { background: linear-gradient(135deg, #F7971E 0%, #FFD200 100%); }
+        .grad-5 { background: linear-gradient(135deg, #ec008c 0%, #fc6767 100%); }
+        .grad-6 { background: linear-gradient(135deg, #4776E6 0%, #8E54E9 100%); }
+        .grad-7 { background: linear-gradient(135deg, #1D976C 0%, #93F9B9 100%); }
+        .grad-8 { background: linear-gradient(135deg, #FF8008 0%, #FFC837 100%); }
+        .grad-9 { background: linear-gradient(135deg, #EB3349 0%, #F45C43 100%); }
+
+        .grad-4 .card-number,
+        .grad-7 .card-number,
+        .grad-8 .card-number {
+            color: #0f172a;
+            text-shadow: none;
+        }
+
+        @media (max-width: 640px) {
+            h1 { font-size: 2rem; }
+            .roles-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="badge-header">Interactive Classroom Activity</div>
+        <h1>Mystery Case Study Deck</h1>
+        <p class="subtitle">
+            Each team of 3–4 students picks a mystery card number! Click any card to flip and reveal your real-world case study topic, or use the <b>Surprise Random Picker</b>.
+        </p>
+
+        <div class="toolbar">
+            <div class="stats-pill">
+                <span>Total Topics: <b id="total-count">70</b></span>
+                <span>Revealed: <b id="flipped-count">0</b></span>
+                <span>Assigned: <b id="claimed-count">0</b></span>
+            </div>
+            <button class="btn btn-primary" onclick="pickRandomCard()">🎲 Surprise Random Picker</button>
+            <button class="btn btn-secondary" onclick="shuffleDeck()">🔀 Shuffle Numbers</button>
+            <button class="btn btn-secondary" onclick="toggleRevealAll()" id="reveal-btn">👁️ Peek All Topics</button>
+            <button class="btn btn-danger" onclick="resetDeck()">↺ Reset Board</button>
+        </div>
+    </header>
+
+    <main class="grid-container" id="card-grid"></main>
+
+    <!-- Spotlight Modal -->
+    <div class="modal-overlay" id="spotlight-modal" onclick="closeModal(event)">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <div class="modal-num" id="m-num">CARD #1 • CATEGORY</div>
+            <h2 class="modal-title" id="m-title">Case Study Title</h2>
+            <div class="modal-hook" id="m-hook">The main mystery question goes here.</div>
+            
+            <div class="skills-box" style="margin-bottom: 1.25rem;">
+                <span class="skills-label">Key Soft Skills to Analyze in Your Presentation</span>
+                <div class="skills-text" id="m-skills" style="font-size: 0.95rem;">Leadership & Communication</div>
+            </div>
+
+            <div class="roles-guide">
+                <h4>Suggested 4-Student Team Breakdown</h4>
+                <div class="roles-grid">
+                    <div><b>1. The Storyteller:</b> The rise & why it seemed unstoppable</div>
+                    <div><b>2. The Detective:</b> Human errors & ignored warnings</div>
+                    <div><b>3. The Crisis Analyst:</b> How leaders reacted to the fallout</div>
+                    <div><b>4. The Consultant:</b> 3 soft-skill rules that could have saved it</div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 0.75rem;">
+                <button class="btn btn-primary" style="flex:1; justify-content:center;" id="m-claim-btn">✅ Lock / Assign to This Team</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const topics = [
+            // 1. Indian Corporate Rise & Fall
+            { title: "Byju's EdTech Collapse", category: "Indian Business", color: "#ef4444", hook: "How did India's most valuable $22 Billion startup go from sponsoring the FIFA World Cup to struggling to pay employee salaries?", skills: "Ethical Selling, Toxic Work Pressure & Financial Humility" },
+            { title: "The Grounding of Kingfisher Airlines", category: "Indian Business", color: "#ef4444", hook: "Why did India's most glamorous 5-star airline collapse into massive debt despite having loyal flyers?", skills: "Leadership Ego, Accountability & Flash vs. Substance" },
+            { title: "Tata Nano: The 'Cheapest Car' Backfire", category: "Indian Business", color: "#ef4444", hook: "Why did Ratan Tata's brilliant engineering marvel built for Indian families fail just because of how it was marketed?", skills: "Consumer Empathy, Emotional Intelligence & Brand Messaging" },
+            { title: "Paytm Payments Bank Crisis", category: "Indian Business", color: "#ef4444", hook: "Why did India's fintech pioneer face strict RBI bans after ignoring years of compliance warnings?", skills: "Corporate Governance, Rule-Following & Listening to Regulators" },
+            { title: "Jet Airways: Death of a Giant", category: "Indian Business", color: "#ef4444", hook: "How did India's largest private airline collapse after refusing to adapt to budget airlines like IndiGo?", skills: "Adaptability, Delegation & Founder Micromanagement" },
+            { title: "Satyam Computers ('India's Enron')", category: "Indian Business", color: "#ef4444", hook: "How did the founder of an award-winning IT giant fake ₹7,000 Crore in bank balances for years without the board stopping him?", skills: "Integrity, Whistleblowing & Independent Board Questioning" },
+            { title: "Snapdeal's Fall from #1", category: "Indian Business", color: "#ef4444", hook: "How did Snapdeal lose the Indian e-commerce crown to Flipkart and Amazon after constant identity confusion?", skills: "Strategic Clarity, Team Alignment & Focus" },
+            { title: "Cafe Coffee Day's Debt Trap", category: "Indian Business", color: "#ef4444", hook: "How did the iconic cafe chain that taught Indian youth to drink coffee collapse under extreme financial pressure?", skills: "Stress Management, Transparent Communication & Delegation" },
+            { title: "Hike Messenger's Super-App Gamble", category: "Indian Business", color: "#ef4444", hook: "Why did India's coolest homegrown messaging unicorn shut down despite raising hundreds of millions of dollars?", skills: "User-Centric Thinking, Feature Bloat vs. Simplicity" },
+            { title: "Sahara India Pariwar's Collapse", category: "Indian Business", color: "#ef4444", hook: "How did the empire that sponsored the Indian Cricket Team and owned luxury hotels crumble over regulatory defiance?", skills: "Accountability, Arrogance vs. Law & Stakeholder Trust" },
+            { title: "Dunzo's Quick-Commerce Burnout", category: "Indian Business", color: "#ef4444", hook: "Dunzo pioneered instant delivery in India, so why did Blinkit and Zepto overtake it while Dunzo ran out of cash?", skills: "Sustainable Pacing, Crisis Communication & Resource Planning" },
+            { title: "Micromax: From #1 to Invisible", category: "Indian Business", color: "#ef4444", hook: "Micromax once beat Samsung in India. How did it get completely wiped out when 4G and Chinese brands arrived?", skills: "Long-Term Vision, Innovation Culture & Customer Loyalty" },
+            { title: "Air India's Decades of Decline (Pre-Tata)", category: "Indian Business", color: "#ef4444", hook: "JRD Tata made Air India one of the world's best airlines—how did bureaucracy turn it into a loss-making giant?", skills: "Workplace Accountability, Service Attitude & Bureaucratic Inertia" },
+            { title: "Big Bazaar (Future Group) Meltdown", category: "Indian Business", color: "#ef4444", hook: "How did the 'Sabse Sasta Din' retail king of India vanish from malls across the country?", skills: "Over-Expansion Risk, Negotiation Conflict & Digital Adaptation" },
+
+            // 2. Global Tech & Business Giants That Missed the Boat
+            { title: "Nokia's Smartphone Blindspot", category: "Tech Giants", color: "#6366f1", hook: "Why did the undisputed king of durable mobile phones lose everything to the iPhone and Android in just 5 years?", skills: "Psychological Safety (Managers hid bad news from bosses out of fear)" },
+            { title: "Kodak Invented the Digital Camera—And Hid It", category: "Tech Giants", color: "#6366f1", hook: "Why did the company that literally invented the first digital camera in 1975 go bankrupt because of digital cameras?", skills: "Leaving Comfort Zones, Embracing Change & Fear of Self-Disruption" },
+            { title: "Blockbuster Laughing at Netflix", category: "Tech Giants", color: "#6366f1", hook: "In 2000, Netflix offered to sell itself to Blockbuster for $50M. Blockbuster laughed them out of the room—and went bankrupt 10 years later.", skills: "Humility in Leadership, Open-Mindedness & Future Vision" },
+            { title: "BlackBerry's Keyboard Obsession", category: "Tech Giants", color: "#6366f1", hook: "Why did BlackBerry insist that business people would never want touchscreen phones without physical buttons?", skills: "Active Listening, Customer Empathy & Letting Go of Past Glory" },
+            { title: "Yahoo's $1 Trillion Mistakes", category: "Tech Giants", color: "#6366f1", hook: "Yahoo had the chance to buy both Google and Facebook for cheap and refused both. How did internal confusion destroy an internet giant?", skills: "Decisive Leadership, Identity Clarity & Negotiation" },
+            { title: "Toys 'R' Us: The Toy Store That Forgot How to Play", category: "Tech Giants", color: "#6366f1", hook: "Why did the world's biggest wonderland for kids go bankrupt while outsourcing its online store to Amazon?", skills: "Customer Experience, Digital Foresight & Store Morale" },
+            { title: "MySpace Losing to Facebook", category: "Tech Giants", color: "#6366f1", hook: "MySpace had a massive head start as the #1 social network. Why did everyone abandon it for Facebook?", skills: "Listening to Users vs. Corporate Greed & Cluttered Communication" },
+            { title: "Xerox PARC's Stolen Genius", category: "Tech Giants", color: "#6366f1", hook: "Xerox engineers invented the mouse, windows icon interface, and personal computing—why did Steve Jobs and Apple get rich off it instead?", skills: "Internal Communication & Valuing Your Own Team's Ideas" },
+            { title: "Quibi's $1.75 Billion 6-Month Flop", category: "Tech Giants", color: "#6366f1", hook: "Hollywood legends raised $1.75 Billion for a 10-minute video app that died in 6 months while TikTok conquered the world for free.", skills: "Youth Culture Awareness, Humility & Testing Assumptions" },
+            { title: "Segway: Overhyped 'City-Changer'", category: "Tech Giants", color: "#6366f1", hook: "Experts predicted the Segway would replace cars and redesign cities. Why did it end up as a mall-security joke?", skills: "Secretive Echo Chambers vs. Real-World User Feedback" },
+            { title: "Google Glass: Brilliant Tech, Zero Social IQ", category: "Tech Giants", color: "#6366f1", hook: "Why did Google's futuristic smart-glasses get banned from cafes and mocked by the public?", skills: "Social Intelligence, Privacy Empathy & Human Etiquette" },
+            { title: "Sony Betamax vs. VHS Format War", category: "Tech Giants", color: "#6366f1", hook: "Sony's Betamax had better video quality, so why did JVC's VHS win the global home video war?", skills: "Collaboration & Partnership vs. Pride and Isolation" },
+            { title: "Vine's Shutdown Before the TikTok Boom", category: "Tech Giants", color: "#6366f1", hook: "Vine pioneered 6-second viral loops, so why did it die right before TikTok turned short videos into a global empire?", skills: "Creator Relations, Conflict Resolution & Value Recognition" },
+            { title: "Motorola's Post-RAZR Collapse", category: "Tech Giants", color: "#6366f1", hook: "Everyone wanted a Motorola RAZR flip phone in 2005. Why did the company crash immediately afterward?", skills: "Complacency, Resting on Laurels & Continuous Learning" },
+
+            // 3. Disasters & Engineering Hubris (Titanic Style)
+            { title: "Why the 'Unsinkable' Titanic Sank", category: "Disaster & Hubris", color: "#0ea5e9", hook: "Why did the Titanic sail at full speed into an iceberg field with half the needed lifeboats while ignoring 6 radio warnings?", skills: "Overconfidence Bias, Crisis Communication & Class Prejudice" },
+            { title: "OceanGate Titan Submersible Implosion", category: "Disaster & Hubris", color: "#0ea5e9", hook: "Why did the OceanGate CEO fire engineers who warned him the carbon-fiber hull would implode on the way to the Titanic?", skills: "Toxic Positivity, Silencing Dissent & Hubris vs. Safety" },
+            { title: "NASA Challenger Space Shuttle Disaster", category: "Disaster & Hubris", color: "#0ea5e9", hook: "Rocket engineers begged NASA not to launch in freezing weather that morning. Why did managers overrule them?", skills: "Groupthink, Assertive Communication & Schedule Pressure" },
+            { title: "NASA Columbia Foam Strike Ignored", category: "Disaster & Hubris", color: "#0ea5e9", hook: "17 years after Challenger, why did NASA managers once again dismiss engineers' requests to inspect wing damage in orbit?", skills: "Organizational Memory, Hierarchy Barriers & Normalization of Deviance" },
+            { title: "Boeing 737 MAX Crisis", category: "Disaster & Hubris", color: "#0ea5e9", hook: "How did Boeing, once the gold standard of engineering trust, hide a critical software flaw from pilots to save training costs?", skills: "Ethics vs. Profit, Transparency & Speak-Up Culture" },
+            { title: "Chernobyl Nuclear Disaster", category: "Disaster & Hubris", color: "#0ea5e9", hook: "How did a routine safety test turn into history's worst nuclear catastrophe because operators were terrified of their boss?", skills: "Fear-Based Leadership, Blame Culture & Truth-Telling" },
+            { title: "1996 Mount Everest Disaster ('Into Thin Air')", category: "Disaster & Hubris", color: "#0ea5e9", hook: "Why did experienced mountain guides ignore their own strict '2:00 PM Turn-Around Rule' and walk into a deadly blizzard?", skills: "Sunk-Cost Fallacy, Peer Pressure & Boundary Setting" },
+            { title: "Deepwater Horizon Oil Spill", category: "Disaster & Hubris", color: "#0ea5e9", hook: "VIP executives were visiting the oil rig to celebrate '7 years without an accident' on the exact day warnings were ignored and it exploded.", skills: "Complacency, Misaligned Incentives & Safety Communication" },
+            { title: "Tenerife Airport Collision (583 Dead)", category: "Disaster & Hubris", color: "#0ea5e9", hook: "How did two Boeing 747s collide on a foggy runway simply because a junior co-pilot was too intimidated to stop his famous senior captain?", skills: "Power Distance, Assertiveness & Crew Resource Management" },
+            { title: "Costa Concordia Cruise Shipwreck", category: "Disaster & Hubris", color: "#0ea5e9", hook: "Why did the captain steer a massive cruise ship into shallow rocks just to 'wave' at the island—and then abandon ship before passengers?", skills: "Moral Courage, Crisis Leadership & Ego" },
+            { title: "Ford Pinto's Deadly Cost-Benefit Memo", category: "Disaster & Hubris", color: "#0ea5e9", hook: "Ford discovered their car's fuel tank exploded in rear-end crashes ($11 fix per car), but calculated it was cheaper to pay lawsuits than fix it.", skills: "Business Ethics, Human Empathy vs. Cold Numbers" },
+            { title: "Fukushima Nuclear Meltdown", category: "Disaster & Hubris", color: "#0ea5e9", hook: "Why were engineers' warnings that seawalls were too low ignored because questioning safety was seen as 'impolite'?", skills: "Cultural Politeness vs. Critical Risk Communication" },
+            { title: "Concorde: Rise & Fall of Supersonic Flight", category: "Disaster & Hubris", color: "#0ea5e9", hook: "Why did the British and French governments keep pouring billions into a supersonic jet they knew would never make a profit?", skills: "Sunk-Cost Fallacy, National Pride & Knowing When to Quit" },
+
+            // 4. Frauds, Hype & Cult Leadership
+            { title: "Theranos & Elizabeth Holmes", category: "Hype & Fraud", color: "#ec4899", hook: "How did a 19-year-old dropout fake a deep voice and wear Steve Jobs' black turtleneck to trick billionaires into believing a fake blood machine?", skills: "Charisma vs. Character, Manipulation & Due Diligence" },
+            { title: "The Fyre Festival Luxury Scam", category: "Hype & Fraud", color: "#ec4899", hook: "How did a VIP music festival promoted by supermodels trap rich influencers on an island with disaster tents and wet cheese sandwiches?", skills: "Hype vs. Execution, Delusional Optimism & Influencer Ethics" },
+            { title: "WeWork's $47 Billion Meltdown", category: "Hype & Fraud", color: "#ec4899", hook: "How did Adam Neumann convince the world that renting office desks was 'elevating the world's consciousness' before crashing the IPO?", skills: "Cult Leadership, Storytelling vs. Reality & Governance" },
+            { title: "FTX & Sam Bankman-Fried's Crypto Crash", category: "Hype & Fraud", color: "#ec4899", hook: "How did a messy-haired 'altruistic genius' lose $8 Billion of customer money while running a multi-billion company on group chats?", skills: "Fake Humility (Halo Effect), Accountability & Financial Discipline" },
+            { title: "Volkswagen 'Dieselgate' Emissions Scandal", category: "Hype & Fraud", color: "#ec4899", hook: "When bosses demanded impossible pollution targets and refused to hear 'no', engineers wrote secret code to cheat government tests.", skills: "Unrealistic Goal-Setting, Fear of Failure & Corporate Honesty" },
+            { title: "Enron: 'The Smartest Guys in the Room'", category: "Hype & Fraud", color: "#ec4899", hook: "How did a company that fired the bottom 15% of staff every year create a ruthless culture that destroyed the entire firm?", skills: "Toxic Competition ('Rank & Yank'), Greed & Whistleblower Courage" },
+            { title: "Wells Fargo Fake Accounts Scandal", category: "Hype & Fraud", color: "#ec4899", hook: "Why did thousands of ordinary bank employees secretly open 3.5 million fake accounts for customers without their permission?", skills: "Toxic Sales Targets, Ethical Pressure & Management Blindness" },
+            { title: "Wirecard's Missing €1.9 Billion", category: "Hype & Fraud", color: "#ec4899", hook: "When journalists proved Germany's star fintech company had invented €1.9 Billion out of thin air, why did authorities attack the journalists instead?", skills: "Confirmation Bias, Defensiveness & Critical Thinking" },
+            { title: "Nikola Motors: Rolling a Truck Down a Hill", category: "Hype & Fraud", color: "#ec4899", hook: "To prove their 'working' electric semi-truck, Nikola towed an empty shell to the top of a hill and filmed it rolling down by gravity.", skills: "Deception in Marketing, Integrity & Short-Term Lies" },
+            { title: "Juicero: The $400 Wi-Fi Juice Squeezer", category: "Hype & Fraud", color: "#ec4899", hook: "Silicon Valley invested $120M in a smart machine to squeeze juice packs—until reporters showed you could squeeze the bags faster with bare hands.", skills: "Groupthink in Investing, Over-Engineering & Common Sense" },
+            { title: "Lance Armstrong's Doping Empire", category: "Hype & Fraud", color: "#ec4899", hook: "How did the 7-time Tour de France hero bully teammates, sue truth-tellers, and use his cancer charity as a shield for the biggest lie in sports?", skills: "Intimidation, Reputation Management & Genuine Apology" },
+
+            // 5. Marketing Blunders, PR Disasters & Culture Clashes
+            { title: "New Coke (1985): Marketing's Biggest Blunder", category: "PR & Culture", color: "#f59e0b", hook: "Blind taste tests proved people preferred a sweeter recipe, so why did Americans protest in the streets when Coca-Cola changed its formula?", skills: "Emotional Attachment vs. Data & Admitting Mistakes Quickly" },
+            { title: "Pepsi's Kendall Jenner Protest Ad", category: "PR & Culture", color: "#f59e0b", hook: "How did a room full of executives approve an ad suggesting a supermodel handing a police officer a Pepsi could solve social justice protests?", skills: "Diversity of Thought, Echo Chambers & Cultural Sensitivity" },
+            { title: "United Airlines: 'United Breaks Guitars'", category: "PR & Culture", color: "#f59e0b", hook: "United Airlines refused to pay $1,200 after baggage handlers broke a musician's guitar. His revenge song got 20M views and tanked their stock by $180M.", skills: "Customer Empathy, Conflict Resolution & Frontline Empowerment" },
+            { title: "Airbnb's 'Belong Anywhere' vs. Reality", category: "PR & Culture", color: "#f59e0b", hook: "How did Airbnb handle severe crises around guest safety, hidden cameras, and host discrimination while preaching 'belonging'?", skills: "Crisis Ownership, Trust-Building & Inclusive Design" },
+            { title: "Starbucks fails in Australia", category: "PR & Culture", color: "#f59e0b", hook: "Starbucks conquered the world, so why did Australians reject it so badly that 70% of stores had to close?", skills: "Cross-Cultural Intelligence, Humility & Respecting Local Habits" },
+            { title: "Walmart's Expensive Failure in Germany", category: "PR & Culture", color: "#f59e0b", hook: "Why did forcing German cashiers to smile at strangers and chant morning cheers creep out shoppers and cost Walmart $1 Billion?", skills: "Cross-Cultural Communication & Adapting Management Styles" },
+            { title: "Target Canada's 2-Year Disaster", category: "PR & Culture", color: "#f59e0b", hook: "Target opened 133 stores in Canada all at once—only for customers to walk into empty shelves because the software had wrong item measurements.", skills: "Project Realism, Speaking Up About Deadlines & Patience" },
+            { title: "McDonald's Arch Deluxe ($300M Flop)", category: "PR & Culture", color: "#f59e0b", hook: "Why did McDonald's spend $300 million trying to convince adults that its burgers were sophisticated gourmet dining?", skills: "Self-Awareness, Brand Identity & Knowing Your Audience" },
+            { title: "Cyberpunk 2077's Disastrous Launch", category: "PR & Culture", color: "#f59e0b", hook: "After 8 years of insane hype, the game launched so broken that Sony removed it from the PlayStation Store—how did the team later redeem it?", skills: "Managing Expectations, Crunch Burnout & Earning Back Trust" },
+            { title: "CNN+ Shut Down in Just 23 Days", category: "PR & Culture", color: "#f59e0b", hook: "How did a media giant spend $300 million and hire hundreds of journalists for a streaming service that lasted barely 3 weeks?", skills: "Inter-Department Communication & Strategic Alignment" },
+            { title: "Quaker Oats Buying Snapple ($1.4B Loss)", category: "PR & Culture", color: "#f59e0b", hook: "Quaker bought quirky tea brand Snapple for $1.7B, erased its weird personality with corporate ads, and sold it 27 months later for just $300M.", skills: "Authenticity, Post-Merger Culture Clash & Respecting Quirks" },
+            { title: "2017 Oscars Best Picture Envelope Mix-Up", category: "PR & Culture", color: "#f59e0b", hook: "How did an accountant tweeting backstage cause La La Land to be wrongly crowned Best Picture instead of Moonlight on live TV?", skills: "Focus Under Pressure, Attention to Detail & Graceful Recovery" },
+
+            // 6. Incredible Comebacks & Masterclasses (Positive Contrasts!)
+            { title: "Tylenol 1982 Crisis (The PR Gold Standard)", category: "Masterclass & Comeback", color: "#10b981", hook: "When someone poisoned Tylenol capsules in stores, Johnson & Johnson immediately recalled 31 million bottles ($100M) even though it wasn't their fault.", skills: "Putting People Over Profit, Radical Transparency & Crisis Leadership" },
+            { title: "Domino's Pizza: 'Our Pizza Sucks' Turnaround", category: "Masterclass & Comeback", color: "#10b981", hook: "In 2009, Domino's went on TV and read real tweets saying their crust tasted like cardboard—and promised to fix it. Their stock rose 2,000%.", skills: "Radical Honesty, Vulnerability & Accepting Brutal Feedback" },
+            { title: "Maggi Noodles' Comeback in India (2015)", category: "Masterclass & Comeback", color: "#10b981", hook: "After a nationwide ban and 38,000 tonnes of noodles destroyed, how did Maggi win back the trust of Indian mothers in just months?", skills: "Emotional Storytelling, Stakeholder Communication & Trust Repair" },
+            { title: "Cadbury India's Worm Crisis (Amitabh Campaign)", category: "Masterclass & Comeback", color: "#10b981", hook: "When worms were found in Dairy Milk bars right before Diwali, sales dropped 30%. How did Cadbury redesign packaging and save its reputation?", skills: "Accountability, Visible Action & Credible Communication" },
+            { title: "Apple in 1997: 90 Days from Bankruptcy", category: "Masterclass & Comeback", color: "#10b981", hook: "Apple was 90 days away from going broke. How did cutting 70% of products and launching 'Think Different' create a $3 Trillion company?", skills: "Ruthless Prioritization, Saying 'No' & Inspirational Vision" },
+            { title: "LEGO's Near-Death & Revival", category: "Masterclass & Comeback", color: "#10b981", hook: "In 2003, LEGO was losing $1M a day making theme parks and clothes. How did going back to basics and listening to adult fans save the brick?", skills: "Core Identity, Community Co-Creation & Financial Discipline" }
+        ];
+
+        // State tracking
+        let deckOrder = topics.map((t, idx) => ({ ...t, originalIndex: idx, flipped: false, claimed: false }));
+        let allRevealed = false;
+        let activeModalCardIdx = null;
+
+        function renderDeck() {
+            const grid = document.getElementById('card-grid');
+            grid.innerHTML = '';
+
+            deckOrder.forEach((item, displayIdx) => {
+                const cardNumber = displayIdx + 1;
+                const gradClass = `grad-${displayIdx % 10}`;
+
+                const scene = document.createElement('div');
+                scene.className = 'card-scene';
+
+                scene.innerHTML = `
+                    <div class="card ${item.flipped ? 'is-flipped' : ''} ${item.claimed ? 'is-claimed' : ''}" id="card-${displayIdx}" onclick="flipCard(${displayIdx})">
+                        <!-- FRONT -->
+                        <div class="card-face card-front ${gradClass}">
+                            <div class="mystery-icon">🎁</div>
+                            <div class="card-number">#${cardNumber}</div>
+                            <div class="mystery-label">${item.claimed ? '🔒 Assigned' : 'Tap to Reveal'}</div>
+                        </div>
+
+                        <!-- BACK -->
+                        <div class="card-face card-back" style="border-color: ${item.color}">
+                            <div>
+                                <div class="card-back-top">
+                                    <span class="cat-tag" style="background:${item.color}">${item.category}</span>
+                                    <div style="display:flex; align-items:center; gap:0.4rem;">
+                                        <span class="claimed-stamp">✓ Assigned</span>
+                                        <span class="card-num-small">#${cardNumber}</span>
+                                    </div>
+                                </div>
+                                <div class="topic-title">${item.title}</div>
+                                <div class="topic-hook">${item.hook}</div>
+                            </div>
+                            <div>
+                                <div class="skills-box" style="border-left-color:${item.color}">
+                                    <span class="skills-label">Soft Skills Focus</span>
+                                    <div class="skills-text">${item.skills}</div>
+                                </div>
+                                <div class="card-actions" onclick="event.stopPropagation()">
+                                    <button class="btn-card btn-claim ${item.claimed ? 'claimed' : ''}" onclick="toggleClaim(${displayIdx})">
+                                        ${item.claimed ? '✓ Assigned' : 'Assign Team'}
+                                    </button>
+                                    <button class="btn-card btn-expand" onclick="openSpotlight(${displayIdx})">
+                                        🔍 Full View
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(scene);
+            });
+
+            updateStats();
+        }
+
+        function flipCard(idx) {
+            deckOrder[idx].flipped = !deckOrder[idx].flipped;
+            const cardEl = document.getElementById(`card-${idx}`);
+            if (cardEl) {
+                cardEl.classList.toggle('is-flipped', deckOrder[idx].flipped);
+            }
+            updateStats();
+        }
+
+        function toggleClaim(idx) {
+            deckOrder[idx].claimed = !deckOrder[idx].claimed;
+            renderDeck();
+            if (activeModalCardIdx === idx) {
+                updateModalClaimBtn(idx);
+            }
+        }
+
+        function updateStats() {
+            const flipped = deckOrder.filter(c => c.flipped).length;
+            const claimed = deckOrder.filter(c => c.claimed).length;
+            document.getElementById('total-count').textContent = deckOrder.length;
+            document.getElementById('flipped-count').textContent = flipped;
+            document.getElementById('claimed-count').textContent = claimed;
+        }
+
+        function shuffleDeck() {
+            for (let i = deckOrder.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deckOrder[i], deckOrder[j]] = [deckOrder[j], deckOrder[i]];
+            }
+            deckOrder.forEach(c => c.flipped = false);
+            allRevealed = false;
+            document.getElementById('reveal-btn').textContent = '👁️ Peek All Topics';
+            renderDeck();
+        }
+
+        function toggleRevealAll() {
+            allRevealed = !allRevealed;
+            deckOrder.forEach(c => c.flipped = allRevealed);
+            document.getElementById('reveal-btn').textContent = allRevealed ? '🙈 Hide All Topics' : '👁️ Peek All Topics';
+            renderDeck();
+        }
+
+        function resetDeck() {
+            if (!confirm('Reset all revealed and assigned cards back to mystery state?')) return;
+            deckOrder.forEach(c => {
+                c.flipped = false;
+                c.claimed = false;
+            });
+            allRevealed = false;
+            document.getElementById('reveal-btn').textContent = '👁️ Peek All Topics';
+            renderDeck();
+        }
+
+        function pickRandomCard() {
+            const availableIndices = deckOrder
+                .map((c, idx) => (!c.claimed ? idx : null))
+                .filter(idx => idx !== null);
+
+            if (availableIndices.length === 0) {
+                alert('All 70 topics have been assigned to teams! Click Reset Board to start over.');
+                return;
+            }
+
+            const chosenIdx = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+            deckOrder[chosenIdx].flipped = true;
+            renderDeck();
+
+            const cardEl = document.getElementById(`card-${chosenIdx}`);
+            if (cardEl) {
+                cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            setTimeout(() => {
+                openSpotlight(chosenIdx);
+            }, 450);
+        }
+
+        function openSpotlight(idx) {
+            activeModalCardIdx = idx;
+            const item = deckOrder[idx];
+            const modal = document.getElementById('spotlight-modal');
+            const modalCard = modal.querySelector('.modal-card');
+            
+            modalCard.style.borderTopColor = item.color;
+            document.getElementById('m-num').textContent = `MYSTERY CARD #${idx + 1} • ${item.category}`;
+            document.getElementById('m-num').style.color = item.color;
+            document.getElementById('m-title').textContent = item.title;
+            document.getElementById('m-hook').textContent = item.hook;
+            document.getElementById('m-skills').textContent = item.skills;
+
+            updateModalClaimBtn(idx);
+            modal.classList.add('active');
+        }
+
+        function updateModalClaimBtn(idx) {
+            const btn = document.getElementById('m-claim-btn');
+            const isClaimed = deckOrder[idx].claimed;
+            btn.textContent = isClaimed ? '🔒 Assigned to Team (Click to Unassign)' : '✅ Lock / Assign to This Team';
+            btn.style.background = isClaimed ? '#64748b' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+            btn.onclick = () => toggleClaim(idx);
+        }
+
+        function closeModal(e) {
+            document.getElementById('spotlight-modal').classList.remove('active');
+            activeModalCardIdx = null;
+        }
+
+        // Initialize on load
+        renderDeck();
+    </script>
+</body>
+</html>
